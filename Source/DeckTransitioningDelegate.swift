@@ -26,13 +26,13 @@ public final class DeckTransitioningDelegate: NSObject, UIViewControllerTransiti
     
     // MARK: - Private variables
     
-    private let isSwipeToDismissEnabled: Bool
-    private let presentDuration: TimeInterval?
-    private let presentAnimation: (() -> ())?
-    private let presentCompletion: ((Bool) -> ())?
-    private let dismissDuration: TimeInterval?
-    private let dismissAnimation: (() -> ())?
-    private let dismissCompletion: ((Bool) -> ())?
+    public var isSwipeToDismissEnabled: Bool
+    public var presentDuration: TimeInterval
+    public var presentAnimation: (() -> ())?
+    public var presentCompletion: ((Bool) -> ())?
+    public var dismissDuration: TimeInterval
+    public var dismissAnimation: (() -> ())?
+    public var dismissCompletion: ((Bool) -> ())?
     
     // MARK: - Initializers
     
@@ -55,17 +55,17 @@ public final class DeckTransitioningDelegate: NSObject, UIViewControllerTransiti
     ///   - dismissCompletion: A block that will be run after the card has been
     ///		dismissed
     @objc public init(isSwipeToDismissEnabled: Bool = true,
-                      presentDuration: NSNumber? = nil,
+                      presentDuration: NSNumber = 0.4,
                       presentAnimation: (() -> ())? = nil,
                       presentCompletion: ((Bool) -> ())? = nil,
-                      dismissDuration: NSNumber? = nil,
+                      dismissDuration: NSNumber = 0.4,
                       dismissAnimation: (() -> ())? = nil,
                       dismissCompletion: ((Bool) -> ())? = nil) {
         self.isSwipeToDismissEnabled = isSwipeToDismissEnabled
-        self.presentDuration = presentDuration?.doubleValue
+        self.presentDuration = presentDuration.doubleValue
         self.presentAnimation = presentAnimation
         self.presentCompletion = presentCompletion
-        self.dismissDuration = dismissDuration?.doubleValue
+        self.dismissDuration = dismissDuration.doubleValue
         self.dismissAnimation = dismissAnimation
         self.dismissCompletion = dismissCompletion
     }

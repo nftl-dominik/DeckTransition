@@ -12,11 +12,11 @@ final class DeckPresentingAnimationController: NSObject, UIViewControllerAnimate
     
     // MARK: - Private variables
     
-    private let duration: TimeInterval?
+    private let duration: TimeInterval
     
     // MARK: - Initializers
     
-    init(duration: TimeInterval?) {
+    init(duration: TimeInterval) {
         self.duration = duration
     }
     
@@ -29,23 +29,21 @@ final class DeckPresentingAnimationController: NSObject, UIViewControllerAnimate
         
         let containerView = transitionContext.containerView
         containerView.addSubview(presentedViewController.view)
+        containerView.backgroundColor = .clear
+        presentedViewController.view.backgroundColor = .clear
         presentedViewController.view.frame = CGRect(x: 0, y: containerView.bounds.height, width: containerView.bounds.width, height: containerView.bounds.height)
         
         let finalFrameForPresentedView = transitionContext.finalFrame(for: presentedViewController)
         
-        UIView.animate(
-            withDuration: transitionDuration(using: transitionContext),
-            delay: 0,
-            options: .curveEaseOut,
-            animations: {
-                presentedViewController.view.frame = finalFrameForPresentedView
-            }, completion: { finished in
-                transitionContext.completeTransition(finished)
-            })
+        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 0.7, options: [.curveEaseInOut], animations: {
+            presentedViewController.view.frame = finalFrameForPresentedView
+        }) { finished in
+            transitionContext.completeTransition(finished)
+        }
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return duration ?? Constants.defaultAnimationDuration
+        return duration
     }
     
 }

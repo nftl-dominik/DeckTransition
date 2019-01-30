@@ -12,11 +12,11 @@ final class DeckDismissingAnimationController: NSObject, UIViewControllerAnimate
     
     // MARK: - Private variables
     
-    private let duration: TimeInterval?
+    private let duration: TimeInterval
     
     // MARK: - Initializers
     
-    init(duration: TimeInterval?) {
+    init(duration: TimeInterval) {
         self.duration = duration
     }
     
@@ -42,7 +42,7 @@ final class DeckDismissingAnimationController: NSObject, UIViewControllerAnimate
         UIView.animate(
             withDuration: transitionDuration(using: transitionContext),
             delay: 0,
-            options: .curveEaseOut,
+            options: .curveEaseInOut,
             animations: {
                 presentedViewController.view.frame = offscreenFrame
             }, completion: { finished in
@@ -51,7 +51,7 @@ final class DeckDismissingAnimationController: NSObject, UIViewControllerAnimate
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return duration ?? Constants.defaultAnimationDuration
+        return duration
     }
     
 }
