@@ -94,7 +94,7 @@ final class DeckPresentationController: UIPresentationController, UIGestureRecog
                 }
                 
                 self.presentAnimation?()
-                self.dimmingPresentingView.backgroundColor = UIColor.black.withAlphaComponent(1 - DeckConstants.initialAlphaForPresentingView)
+                self.dimmingPresentingView.backgroundColor = UIColor.black.withAlphaComponent(DeckConstants.alphaValueForDimView)
             }, completion: { _ in
             }
         )
@@ -217,8 +217,17 @@ final class DeckPresentationController: UIPresentationController, UIGestureRecog
             }
         
         case .ended:
+            var duration = 0.25
+            if let requiredY = containerView?.frame.height,
+                let currentY = presentedView?.frame.origin.y {
+                    // Speed should be equal proportionaly to swiped space
+                    let swipedSpacePercentage = Double(currentY/requiredY)
+                    duration = swipedSpacePercentage * 0.25
+                    
+            }
+            
             UIView.animate(
-                withDuration: 0.25,
+                withDuration: duration,
                 animations: {
                     self.presentedView?.transform = .identity
                 })
@@ -232,7 +241,7 @@ final class DeckPresentationController: UIPresentationController, UIGestureRecog
     /// Method to update the modal view for a particular amount of translation
     /// by panning in the vertical direction.
     ///
-    /// The translation of the modal view is proportional to the panning
+    /// If elasticThreshold > 0 the translation of the modal view is proportional to the panning
     /// distance until the `elasticThreshold`, after which it increases at a
     /// slower rate, given by `elasticFactor`, to indicate that the
     /// `dismissThreshold` is nearing.
@@ -244,29 +253,33 @@ final class DeckPresentationController: UIPresentationController, UIGestureRecog
     ///   the container view in the vertical direction
     private func updatePresentedViewForTranslation(inVerticalDirection translation: CGFloat) {
         
-        let elasticThreshold: CGFloat = 120
-        let dismissThreshold: CGFloat = 240
+        let elasticThreshold: CGFloat? = DeckConstants.translationElasticThreshold
+        let dismissThreshold: CGFloat = DeckConstants.translationRequiredToDismiss
         
         let translationFactor: CGFloat = 1/2
         
         /// Nothing happens if the pan gesture is performed from bottom
         /// to top i.e. if the translation is negative
         if translation >= 0 {
-            let translationForModal: CGFloat = {
-                if translation >= elasticThreshold {
-                    let frictionLength = translation - elasticThreshold
-                    let frictionTranslation = 30 * atan(frictionLength/120) + frictionLength/10
-                    return frictionTranslation + (elasticThreshold * translationFactor)
-                } else {
-                    return translation * translationFactor
-                }
-            }()
-            
-            presentedView?.transform = CGAffineTransform(translationX: 0, y: translationForModal)
+            if let elasticThreshold = elasticThreshold {
+                let translationForModal: CGFloat = {
+                    if translation >= elasticThreshold {
+                        let frictionLength = translation - elasticThreshold
+                        let frictionTranslation = 30 * atan(frictionLength/120) + frictionLength/10
+                        return frictionTranslation + (elasticThreshold * translationFactor)
+                    } else {
+                        return translation * translationFactor
+                    }
+                }()
+                presentedView?.transform = CGAffineTransform(translationX: 0, y: translationForModal)
+            } else {
+                presentedView?.transform = CGAffineTransform(translationX: 0, y: translation)
+            }
             
             if translation >= dismissThreshold {
                 presentedViewController.dismiss(animated: true, completion: nil)
             }
+            
         }
     }
 }

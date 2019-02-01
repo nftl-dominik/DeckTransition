@@ -36,7 +36,6 @@ final class DeckDismissingAnimationController: NSObject, UIViewControllerAnimate
         }
         
         let containerView = transitionContext.containerView
-        
         let offscreenFrame = CGRect(x: 0, y: containerView.bounds.height, width: containerView.bounds.width, height: containerView.bounds.height)
         
         UIView.animate(
@@ -51,7 +50,13 @@ final class DeckDismissingAnimationController: NSObject, UIViewControllerAnimate
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return duration
+        guard let requiredY = transitionContext?.containerView.frame.height,
+            let currentY = transitionContext?.view(forKey: .from)?.frame.origin.y else {
+            return duration
+        }
+        // Speed should be equal proportionaly to remaining space
+        let remainingSpacePercentage = Double((requiredY - currentY)/requiredY)
+        return remainingSpacePercentage * duration
     }
     
 }
